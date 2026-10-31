@@ -67,9 +67,9 @@ var S={done:{},custom:[],hidden:{},theme:null};var editing=false;
 function load(){try{var r=localStorage.getItem("malacopa2");if(r)S=JSON.parse(r)}catch(e){}
 if(S.theme)document.documentElement.setAttribute("data-theme",S.theme)}
 function save(){try{localStorage.setItem("malacopa2",JSON.stringify(S))}catch(e){}}
-var GUILT=["Vas perfecto. Así se hace.","Una nada más… ya te estamos viendo.","Tus amigos todavía te quieren. Todavía.","Ya van tres. ¿Y si mejor tomas agua?","Mañana te va a dar pena todo esto.","Ya empezó el desastre. Piensa en tu mamá.","¿Y si mejor te sientas tantito y respiras?","Todos ya lo notaron. TODOS.","Esto va a salir en el grupo mañana.","Te dije. Pide ayuda: que un amigo te quite el cel y te lleve a casa.","Ya fuiste. Ríndete con dignidad: Uber, agua y a dormir."];
+var GUILT=["Vas perfecto. Así se hace.","Una nada más… ya te estamos viendo.","Tus amigos todavía te quieren. Todavía.","Ya van tres. ¿Y si mejor tomas agua?","Mañana te va a dar pena todo esto.","Ya empezó el desastre. Ya te están volteando a ver.","¿Y si mejor te sientas tantito y respiras?","Ya hablan de ti en la cocina.","Mañana eres el chisme del grupo. Y no te van a invitar a la próxima.","Ya nadie te quiere aquí. Que un amigo te quite el cel y te saque.","Eres el malacopa de la peda. Vete, y mejor ni vuelvas."];
 function guilt(n){return GUILT[Math.min(n,GUILT.length-1)]}
-function lvl(n){return n==0?"😇 Impecable":n<3?"🙂 Todavía te quieren":n<5?"😬 Ya empezaste":n<8?"🚨 Llamen a tu mamá":n<11?"🆘 Alguien ayúdelo":"🚕 Pide tu Uber y vete"}
+function lvl(n){return n==0?"😇 Impecable":n<3?"🙂 Todavía te quieren":n<5?"😬 Ya empezaste":n<7?"🚨 Ya nadie te aguanta":n<9?"💀 Ya no te quieren aquí":n<11?"🚫 Ya no te vuelven a invitar":"🗑️ Eres el malacopa. Se acabó."}
 function render(){
 var g=document.getElementById("grid");g.innerHTML="";g.className="grid"+(editing?" editing":"");document.getElementById("addrow").hidden=!editing;document.getElementById("editb").textContent=editing?"✓ Listo":"✏️ Editar";var n=0;
 var all=DEF.filter(function(d){return !(S.hidden||{})[d[1]]}).map(function(d){return{e:d[0],t:d[1],c:-1}}).concat(S.custom.map(function(t,i){return{e:"📝",t:t,c:i}}));
