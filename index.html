@@ -27,6 +27,13 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .big{font-size:56px;line-height:1;min-width:64px;text-align:center}
 .lvl{flex:1;font-size:22px}
 .bar{height:14px;border-radius:8px;background:var(--line);margin-top:6px;overflow:hidden}
+.guilt{font-size:14px;font-weight:600;color:var(--mute);margin-top:6px;min-height:1.2em}
+.guilt.hot{color:var(--bad);font-weight:800}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.55}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.bar.p i{animation:pulse .9s infinite}
+.bar.s{animation:shake .4s infinite}
+.bar{transition:height .3s}
 .bar i{display:block;height:100%;width:0;background:var(--ok);transition:width .3s,background .3s}
 main{max-width:560px;margin:0 auto;padding:12px 12px 40px}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -43,11 +50,11 @@ main{max-width:560px;margin:0 auto;padding:12px 12px 40px}
 .editing .tile::after{display:none}
 [hidden]{display:none!important}
 :focus-visible{outline:4px solid var(--gold);outline-offset:2px}
-@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
 <body>
-<header><div class="hd"><div class="big" id="n">0</div><div class="lvl"><div id="lvl">Impecable</div><div class="bar"><i id="fill"></i></div></div><button class="btn" id="editb" style="padding:10px 12px;font-size:16px">✏️ Editar</button></div></header>
+<header><div class="hd"><div class="big" id="n">0</div><div class="lvl"><div id="lvl">Impecable</div><div class="bar" id="bar"><i id="fill"></i></div><div class="guilt" id="guilt"></div></div><button class="btn" id="editb" style="padding:10px 12px;font-size:16px">✏️ Editar</button></div></header>
 <main>
 <div id="addrow" hidden><div class="add"><input id="inp" placeholder="Escribe una regla nueva" maxlength="40" aria-label="Nueva regla"><button class="btn" id="addb">+</button></div><button class="btn ghost" id="restore" style="margin:0 0 12px">Restaurar reglas borradas</button></div>
 <div class="grid" id="grid"></div>
@@ -60,7 +67,9 @@ var S={done:{},custom:[],hidden:{},theme:null};var editing=false;
 function load(){try{var r=localStorage.getItem("malacopa2");if(r)S=JSON.parse(r)}catch(e){}
 if(S.theme)document.documentElement.setAttribute("data-theme",S.theme)}
 function save(){try{localStorage.setItem("malacopa2",JSON.stringify(S))}catch(e){}}
-function lvl(n){return n==0?"😇 Impecable":n<3?"🙂 Todavía te quieren":n<5?"😬 Ya empezaste":n<8?"🚨 Llamen a tu mamá":"🚕 Pide tu Uber y vete"}
+var GUILT=["Vas perfecto. Así se hace.","Una nada más… ya te estamos viendo.","Tus amigos todavía te quieren. Todavía.","Ya van tres. ¿Y si mejor tomas agua?","Mañana te va a dar pena todo esto.","Ya empezó el desastre. Piensa en tu mamá.","¿Y si mejor te sientas tantito y respiras?","Todos ya lo notaron. TODOS.","Esto va a salir en el grupo mañana.","Te dije. Pide ayuda: que un amigo te quite el cel y te lleve a casa.","Ya fuiste. Ríndete con dignidad: Uber, agua y a dormir."];
+function guilt(n){return GUILT[Math.min(n,GUILT.length-1)]}
+function lvl(n){return n==0?"😇 Impecable":n<3?"🙂 Todavía te quieren":n<5?"😬 Ya empezaste":n<8?"🚨 Llamen a tu mamá":n<11?"🆘 Alguien ayúdelo":"🚕 Pide tu Uber y vete"}
 function render(){
 var g=document.getElementById("grid");g.innerHTML="";g.className="grid"+(editing?" editing":"");document.getElementById("addrow").hidden=!editing;document.getElementById("editb").textContent=editing?"✓ Listo":"✏️ Editar";var n=0;
 var all=DEF.filter(function(d){return !(S.hidden||{})[d[1]]}).map(function(d){return{e:d[0],t:d[1],c:-1}}).concat(S.custom.map(function(t,i){return{e:"📝",t:t,c:i}}));
@@ -69,12 +78,14 @@ var on=!!S.done[it.t];if(on)n++;
 var b=document.createElement("button");b.className="tile"+(on?" done":"");b.setAttribute("aria-pressed",on);
 b.innerHTML='<span class="e"></span><span class="t"></span>';
 b.firstChild.textContent=it.e;b.lastChild.textContent=it.t;
-b.onclick=function(){if(editing){if(it.c>=0)S.custom.splice(it.c,1);else{S.hidden=S.hidden||{};S.hidden[it.t]=1}delete S.done[it.t];save();render();return}if(S.done[it.t])delete S.done[it.t];else{S.done[it.t]=1;if(navigator.vibrate)try{navigator.vibrate(80)}catch(e){}}save();render()};
+b.onclick=function(){if(editing){if(it.c>=0)S.custom.splice(it.c,1);else{S.hidden=S.hidden||{};S.hidden[it.t]=1}delete S.done[it.t];save();render();return}if(S.done[it.t])delete S.done[it.t];else{S.done[it.t]=1;if(navigator.vibrate)try{navigator.vibrate(Object.keys(S.done).length>=8?[120,60,120,60,200]:Object.keys(S.done).length>=5?[100,50,100]:80)}catch(e){}}save();render()};
 if(editing){var x=document.createElement("span");x.className="del";x.textContent="✕";b.appendChild(x)}
 g.appendChild(b)});
 document.getElementById("n").textContent=n;
 document.getElementById("lvl").textContent=lvl(n);
-var f=document.getElementById("fill");f.style.width=Math.min(100,n/8*100)+"%";f.style.background=n<3?"var(--ok)":n<5?"var(--gold)":"var(--bad)"}
+var gl=document.getElementById("guilt");gl.textContent=guilt(n);gl.className="guilt"+(n>=5?" hot":"");
+var br=document.getElementById("bar");br.className="bar"+(n>=5?" p":"")+(n>=8?" s":"");
+var f=document.getElementById("fill");f.style.width=Math.min(100,n/10*100)+"%";f.style.background=n<3?"var(--ok)":n<5?"var(--gold)":"var(--bad)"}
 document.getElementById("addb").onclick=function(){var v=document.getElementById("inp");var s=v.value.trim();if(!s)return;S.custom.push(s);v.value="";save();render()};
 document.getElementById("inp").onkeydown=function(e){if(e.key==="Enter")document.getElementById("addb").click()};
 document.getElementById("editb").onclick=function(){editing=!editing;render();window.scrollTo(0,0)};document.getElementById("restore").onclick=function(){S.hidden={};save();render()};var armed=false;
