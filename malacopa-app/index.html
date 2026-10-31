@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Malacopa</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Malacopa">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#220A18">
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&display=swap">
+<style>
+:root{--bg:#F6E7D8;--card:#FFF8F0;--ink:#2A0E1F;--mute:#7A5A68;--line:#D9BFA9;--bad:#D8261F;--ok:#2F7A5B;--gold:#E59A00;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#220A18;--card:#3A182C;--ink:#FFF3E8;--mute:#C79BAE;--line:#5A2E45;--bad:#FF4B3F;--ok:#6FD3A0;--gold:#FFB020}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#220A18;--card:#3A182C;--ink:#FFF3E8;--mute:#C79BAE;--line:#5A2E45;--bad:#FF4B3F;--ok:#6FD3A0;--gold:#FFB020}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--ink);font:800 20px/1.15 "Bricolage Grotesque",system-ui,sans-serif}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding:10px 12px;border-bottom:3px solid var(--ink)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:6}
+.hd{display:flex;align-items:center;gap:12px;max-width:560px;margin:0 auto}
+.big{font-size:56px;line-height:1;min-width:64px;text-align:center}
+.lvl{flex:1;font-size:22px}
+.bar{height:14px;border-radius:8px;background:var(--line);margin-top:6px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--ok);transition:width .3s,background .3s}
+main{max-width:560px;margin:0 auto;padding:12px 12px 40px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tile{min-height:112px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center;padding:10px 6px;border-radius:18px;border:3px solid var(--line);background:var(--card);color:var(--ink);font:inherit;cursor:pointer;position:relative}
+.tile .e{font-size:38px;line-height:1}
+.tile.done{background:var(--bad);border-color:var(--bad);color:#fff}
+.tile.done::after{content:"✗";position:absolute;top:2px;right:10px;font-size:28px}
+.tile.done .t{text-decoration:line-through;text-decoration-thickness:3px}
+.add{display:flex;gap:8px;margin:18px 0 12px}
+.add input{flex:1;min-width:0;padding:16px;border-radius:14px;border:3px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-weight:600}
+.btn{padding:16px;border-radius:14px;border:3px solid var(--ink);background:var(--ink);color:var(--bg);font:inherit;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--ink);width:100%;margin-top:8px}
+.del{position:absolute;top:-8px;right:-4px;width:34px;height:34px;border-radius:50%;background:var(--ink);color:var(--bg);display:grid;place-items:center;font-size:18px}
+.editing .tile::after{display:none}
+[hidden]{display:none!important}
+:focus-visible{outline:4px solid var(--gold);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header><div class="hd"><div class="big" id="n">0</div><div class="lvl"><div id="lvl">Impecable</div><div class="bar"><i id="fill"></i></div></div><button class="btn" id="editb" style="padding:10px 12px;font-size:16px">✏️ Editar</button></div></header>
+<main>
+<div id="addrow" hidden><div class="add"><input id="inp" placeholder="Escribe una regla nueva" maxlength="40" aria-label="Nueva regla"><button class="btn" id="addb">+</button></div><button class="btn ghost" id="restore" style="margin:0 0 12px">Restaurar reglas borradas</button></div>
+<div class="grid" id="grid"></div>
+<button class="btn ghost" id="reset">Nueva peda</button>
+<button class="btn ghost" id="theme">Claro / oscuro</button>
+</main>
+<script>
+var DEF=[["💬","No hables de más"],["💼","No hables del trabajo"],["💔","No escribas a tu ex"],["👥","No escribas al grupo"],["📱","No contestes historias"],["📸","No subas historias de peda"],["😳","No subas nada vergonzoso"],["🤡","No seas pesado con tus amigos"],["👑","No impongas"],["🙊","Deja hablar a la gente"],["🔁","No repitas la misma historia"],["✋","No interrumpas a la gente"],["👂","Escucha las historias de otros"],["❓","Pregunta cómo están los demás"],["🙋","No acapares la plática"],["🎯","No hables solo de ti"],["😶","No ignores al que está callado"],["🤗","Incluye a los que acaban de llegar"],["🧠","No te hagas el sabelotodo"],["📝","No corrijas a todo el mundo"],["🥱","No insistas con un chiste que no cayó"],["📵","No te claves en el cel"],["🫶","No abraces ni toques de más"],["🗣️","No hables pegado a la cara"],["🤐","No hables mal de los que no están"],["🍿","No te acabes la botana"],["💵","Paga tu parte"],["🏠","Cuida la casa del anfitrión"],["🙏","Agradece al anfitrión"],["🙄","No digas “es broma” después de ofender"],["🏆","No retes a nadie"],["🍻","No obligues a nadie a tomar"],["🤳","No grabes sin permiso"],["🤥","No inventes historias"],["📢","No grites"],["🎵","No cambies la música a cada rato"],["💋","No te beses con cualquiera"],["👀","No coquetees con parejas ajenas"],["🫥","No te desaparezcas sin avisar"],["📲","No pierdas tu cel ni tu cartera"],["😏","No te burles de nadie"],["🎤","No mandes audios"],["😍","No escribas al crush"],["👔","No escribas al jefe"],["📞","No llames a nadie"],["💸","No pidas lana"],["🛒","No compres por internet"],["🚗","No manejes"],["🧾","No reclames cosas viejas"],["🗣️","No cuentes chismes"],["🤫","No cuentes secretos"],["🧠","No des consejos de vida"],["🥃","No mezcles bebidas"],["🍺","No pidas “la última”"],["😭","No te pongas intenso"],["🔥","No te pelees"],["🏛️","No hables de política"],["💰","No presumas lo que ganas"],["🎶","No agarres el micrófono"],["🤝","No digas “te quiero” a extraños"],["🧳","No prometas viajes"],["🙅","No digas “no estoy borracho”"],["👕","No te quites la camisa"],["🪑","No te subas a la mesa"],["🎉","No organices el after"],["📇","No des tu número"]];
+var S={done:{},custom:[],hidden:{},theme:null};var editing=false;
+function load(){try{var r=localStorage.getItem("malacopa2");if(r)S=JSON.parse(r)}catch(e){}
+if(S.theme)document.documentElement.setAttribute("data-theme",S.theme)}
+function save(){try{localStorage.setItem("malacopa2",JSON.stringify(S))}catch(e){}}
+function lvl(n){return n==0?"😇 Impecable":n<3?"🙂 Todavía te quieren":n<5?"😬 Ya empezaste":n<8?"🚨 Llamen a tu mamá":"🚕 Pide tu Uber y vete"}
+function render(){
+var g=document.getElementById("grid");g.innerHTML="";g.className="grid"+(editing?" editing":"");document.getElementById("addrow").hidden=!editing;document.getElementById("editb").textContent=editing?"✓ Listo":"✏️ Editar";var n=0;
+var all=DEF.filter(function(d){return !(S.hidden||{})[d[1]]}).map(function(d){return{e:d[0],t:d[1],c:-1}}).concat(S.custom.map(function(t,i){return{e:"📝",t:t,c:i}}));
+all.forEach(function(it){
+var on=!!S.done[it.t];if(on)n++;
+var b=document.createElement("button");b.className="tile"+(on?" done":"");b.setAttribute("aria-pressed",on);
+b.innerHTML='<span class="e"></span><span class="t"></span>';
+b.firstChild.textContent=it.e;b.lastChild.textContent=it.t;
+b.onclick=function(){if(editing){if(it.c>=0)S.custom.splice(it.c,1);else{S.hidden=S.hidden||{};S.hidden[it.t]=1}delete S.done[it.t];save();render();return}if(S.done[it.t])delete S.done[it.t];else{S.done[it.t]=1;if(navigator.vibrate)try{navigator.vibrate(80)}catch(e){}}save();render()};
+if(editing){var x=document.createElement("span");x.className="del";x.textContent="✕";b.appendChild(x)}
+g.appendChild(b)});
+document.getElementById("n").textContent=n;
+document.getElementById("lvl").textContent=lvl(n);
+var f=document.getElementById("fill");f.style.width=Math.min(100,n/8*100)+"%";f.style.background=n<3?"var(--ok)":n<5?"var(--gold)":"var(--bad)"}
+document.getElementById("addb").onclick=function(){var v=document.getElementById("inp");var s=v.value.trim();if(!s)return;S.custom.push(s);v.value="";save();render()};
+document.getElementById("inp").onkeydown=function(e){if(e.key==="Enter")document.getElementById("addb").click()};
+document.getElementById("editb").onclick=function(){editing=!editing;render();window.scrollTo(0,0)};document.getElementById("restore").onclick=function(){S.hidden={};save();render()};var armed=false;
+document.getElementById("reset").onclick=function(){var b=this;if(!armed){armed=true;b.textContent="¿Seguro? Toca otra vez";setTimeout(function(){armed=false;b.textContent="Nueva peda"},3000);return}
+armed=false;b.textContent="Nueva peda";S.done={};save();render()};
+document.getElementById("theme").onclick=function(){var cur=document.documentElement.getAttribute("data-theme");var dark=cur?cur==="dark":matchMedia("(prefers-color-scheme: dark)").matches;S.theme=dark?"light":"dark";document.documentElement.setAttribute("data-theme",S.theme);save()};
+load();render();
+if("serviceWorker" in navigator){try{navigator.serviceWorker.register("sw.js")}catch(e){}}
+</script>
+</body>
+</html>
